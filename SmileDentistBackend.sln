@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33712.159
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmileDentistBackend", "SmileDentistBackend\SmileDentistBackend.csproj", "{A6194886-2B76-4033-9517-2009AE08300B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A6194886-2B76-4033-9517-2009AE08300B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6194886-2B76-4033-9517-2009AE08300B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6194886-2B76-4033-9517-2009AE08300B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6194886-2B76-4033-9517-2009AE08300B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1F0EBD55-AD6F-4D7C-8C2A-B78BBD5EF0F7}
+	EndGlobalSection
+EndGlobal
