@@ -49,7 +49,7 @@ builder.Services.AddSingleton<ISendGridEmailBookings, SendGridEmailBookings>();
 builder.Services.AddSingleton<ISendGridEmailRegister, SendGridEmailRegister>();
 //mailprovider for tokens
 builder.Services.AddSingleton<ISendGridEmailTokens, SendGridEmailTokens>();
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("SendGrid"));
+//builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("SendGrid"));
 
 //SqlServer
 builder.Services.AddDbContext<QuartzContext>(options =>

@@ -21,11 +21,11 @@ namespace SmileDentistBackend.Controllers
         }
         [Authorize(Roles = StaticDetails.Role_Admin)]
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] DateTime? fields, [FromQuery] DateTime? some, [FromQuery] bool orderedName = true, [FromQuery] bool orderedEmail = true)
+        public async Task<IActionResult> Get([FromQuery] DateTime? fields, [FromQuery] DateTime? endValue, [FromQuery] bool orderedName = true, [FromQuery] bool orderedEmail = true)
         {
-            if (fields != null && some != null)
+            if (fields != null && endValue != null)
             {
-                var sortedFields = await _context.Bookings.Where(x => x.ScheduledTime.Value >= fields.Value.Date && x.ScheduledTime.Value.Date <= some.Value.Date.AddHours(23).AddMinutes(59)).ToListAsync();
+                var sortedFields = await _context.Bookings.Where(x => x.ScheduledTime.Value >= fields.Value.Date && x.ScheduledTime.Value.Date <= endValue.Value.Date.AddHours(23).AddMinutes(59)).ToListAsync();
                 var specificField = sortedFields.OrderBy(x => x.Email);
 
                 if (sortedFields != null)
@@ -55,6 +55,7 @@ namespace SmileDentistBackend.Controllers
 
         [Authorize(Roles = StaticDetails.Role_User)]
         [HttpGet("Users/{id}")]
+        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetUser(Guid id)
         {
             var currentCustomerList = await _context.Bookings.Where(x => x.UserId == id).ToListAsync();

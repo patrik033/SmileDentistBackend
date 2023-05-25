@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using SendGrid.Helpers.Mail;
 using SendGrid;
+using SmileDentistBackend.Email.Token;
 
 namespace SmileDentistBackend.Email.Registering
 {
@@ -13,26 +14,28 @@ namespace SmileDentistBackend.Email.Registering
             _emailSettings = emailSettings;
         }
 
-        public async Task<Response> SendAsync(string from, string to, string subject, string body)
+        public async Task<Response> SendAsync(string from, string to, string subject, string token,string name)
         {
             var environmentVariableKey = Environment.GetEnvironmentVariable("SendGrid");
-            //var sendGridKey = _emailSettings.Value.Key;
-            var client = new SendGridClient(environmentVariableKey);
+            var sendGridClient = new SendGridClient(environmentVariableKey);
+            var sendGridMessage = new SendGridMessage();
+            sendGridMessage.SetFrom(from);
+            sendGridMessage.AddTo(to);
+            sendGridMessage.SetSubject(subject);
+            sendGridMessage.SetTemplateId("d-aa8a242d99ef457c9a6d4c0319c83b0e");
+            sendGridMessage.SetTemplateData(new TokenTemplateData
+            {
+                Name = name,
+                Token = token
+            });
 
-            var msg = new SendGridMessage()
+            var resp = await sendGridClient.SendEmailAsync(sendGridMessage);
+
+            if (resp.IsSuccessStatusCode)
             {
-                From = new EmailAddress(from, "WebApp Registration"),
-                Subject = subject,
-                //PlainTextContent = body,
-                HtmlContent = $"<strong>{body}</strong>"
-            };
-            msg.AddTo(new EmailAddress(to));
-            var response = await client.SendEmailAsync(msg).ConfigureAwait(false);
-            if (response.IsSuccessStatusCode)
-            {
-                return response;
+                return resp;
             }
-            return response;
+            return resp;
         }
     }
 }

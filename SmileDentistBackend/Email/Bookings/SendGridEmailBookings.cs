@@ -18,14 +18,16 @@ namespace SmileDentistBackend.Email.Bookings
             //var sendGridKey = _emailSettings.Value.Key;
             var sendGridClient = new SendGridClient(environmentVariableKey);
             var sendGridMessage = new SendGridMessage();
-
+            DateTime data = (DateTime)time;
+            var niceTime = $"{data.ToLongDateString()} klockan {data.ToShortTimeString()}";
             sendGridMessage.SetFrom(from);
             sendGridMessage.AddTo(to);
+            sendGridMessage.SetSubject(subject);
             sendGridMessage.SetTemplateId("d-e0c5b898b60a45a6ad76aa450b26b442");
             sendGridMessage.SetTemplateData(new ExampleTemplateData
             {
                 Name = name,
-                Time = time,
+                Time = niceTime,
             });
 
             var resp = await sendGridClient.SendEmailAsync(sendGridMessage);

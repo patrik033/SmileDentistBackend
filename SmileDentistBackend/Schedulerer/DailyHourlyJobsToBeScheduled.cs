@@ -10,12 +10,20 @@ namespace SmileDentistBackend.Schedulerer
         private readonly IServiceProvider _serviceProvider;
         private readonly ISendGridEmailBookings _sender;
         private readonly ILogger<DailyHourlyJobsToBeScheduled> _logger;
+        private readonly IConfiguration _configuration;
 
-        public DailyHourlyJobsToBeScheduled(ILogger<DailyHourlyJobsToBeScheduled> logger,IServiceProvider serviceProvider, ISendGridEmailBookings sender)
+        public DailyHourlyJobsToBeScheduled
+            (
+            ILogger<DailyHourlyJobsToBeScheduled> logger,
+            IServiceProvider serviceProvider,
+            ISendGridEmailBookings sender,
+            IConfiguration configuration
+            )
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
             _sender = sender;
+            _configuration = configuration;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -24,10 +32,12 @@ namespace SmileDentistBackend.Schedulerer
             {
                 var service = scope.ServiceProvider.GetService<IRepo>();
                 var allItems = await service.GetByHour();
+                var emailSettings = Environment.GetEnvironmentVariable("EmailSettings");
+                
 
                 foreach(var item in allItems)
                 {
-                    var mailSent = await _sender.SendAsync("patrik.odh@gmail.com", "patrik.odh@gmail.com", "Scheduled Time", "", item.ScheduledTime, item.Name);
+                    var mailSent = await _sender.SendAsync(emailSettings, emailSettings, "Scheduled Time", "", item.ScheduledTime, item.Name);
                     if (mailSent.IsSuccessStatusCode)
                     {
                         item.MailHasBeenSent = true;

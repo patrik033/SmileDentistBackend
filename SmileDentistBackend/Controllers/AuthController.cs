@@ -30,6 +30,7 @@ namespace SmileDentistBackend.Controllers
         private readonly ISendGridEmailRegister _tokenEmail;
         private readonly ILogger<AuthController> _logger;
         private readonly string secretKey;
+        private readonly IConfiguration _configuration;
 
         public AuthController(QuartzContext context,
             IConfiguration configuration,
@@ -49,6 +50,7 @@ namespace SmileDentistBackend.Controllers
             _logger = logger;
             secretKey = configuration.GetValue<string>("ApiSettings:Secret");
             _response = new ApiResponse();
+            _configuration = configuration;
         }
 
         [Authorize]
@@ -237,8 +239,8 @@ namespace SmileDentistBackend.Controllers
                 else
                 {
                     var identityDescribor = new IdentityErrorDescriber().InvalidToken();
-                    var some = result.Errors.Any(x => x.Code == nameof(IdentityErrorDescriber.InvalidToken));
-                    if (some)
+                    var expiredToken = result.Errors.Any(x => x.Code == nameof(IdentityErrorDescriber.InvalidToken));
+                    if (expiredToken)
                     {
                         ResponseResult(HttpStatusCode.Forbidden, false, "The token has expired", "");
                         return StatusCode(StatusCodes.Status401Unauthorized, _response);
@@ -303,9 +305,12 @@ namespace SmileDentistBackend.Controllers
 
                         var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(notExistingUser);
                         var urlToken = Base64UrlEncoder.Encode(emailToken);
-                        string link = string.Format($"http://localhost:3000/RegisterConfirmation?email={notExistingUser.Email}&activationToken={urlToken}");
-                        string body = $"<a href='{link}'>Confirm</a>";
-                        await _tokenEmail.SendAsync("patrik.odh@gmail.com", "patrik.odh@gmail.com", "Confirm email link", body);
+                        string token = string.Format($"http://localhost:3000/RegisterConfirmation?email={notExistingUser.Email}&activationToken={urlToken}");
+                        string body = $"<a href='{token}'>Klicka på länken för att bekräfta</a>";
+                        var emailSettings = Environment.GetEnvironmentVariable("EmailSettings");
+
+                        var test = registerRequestDTO;
+                        await _tokenEmail.SendAsync(emailSettings, emailSettings, "Bekräfta din email", token, registerRequestDTO.Name);
 
                         ResponseResult(HttpStatusCode.OK, true, "", "");
                         return Ok(_response);
@@ -330,10 +335,12 @@ namespace SmileDentistBackend.Controllers
                 var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 //var confirmLink = Url.p(nameof(ConfirmEmail), "Account", new { emailToken, email = notExistingUser.Email }, Request.Scheme);
                 var urlToken = Base64UrlEncoder.Encode(emailToken);
-                string link = string.Format($"http://localhost:3000/RegisterConfirmation?email={user.Email}&activationToken={urlToken}");
-                string body = $"<a href='{link}'>Confirm</a>";
+                string token = string.Format($"http://localhost:3000/RegisterConfirmation?email={user.Email}&activationToken={urlToken}");
+                string body = $"<a href='{token}'>Klicka på länken för att bekräfta</a>";
 
-                await _tokenEmail.SendAsync("patrik.odh@gmail.com", "patrik.odh@gmail.com", "Confirm email link", body);
+                var emailSettings = Environment.GetEnvironmentVariable("EmailSettings");
+
+                await _tokenEmail.SendAsync(emailSettings, emailSettings, "Bekräfta din email", token, user.Name);
 
                 ResponseResult(HttpStatusCode.OK, true, "", "");
                 return Ok(_response);
@@ -349,10 +356,12 @@ namespace SmileDentistBackend.Controllers
             if (user != null)
             {
                 var passwordToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                string link = $"http://localhost:3000/UpdatePassword?email={user.Email}&activationToken={Base64UrlEncoder.Encode(passwordToken)}";
-                string body = $"<a href='{link}'>Confirm</a>";
+                string token = $"http://localhost:3000/UpdatePassword?email={user.Email}&activationToken={Base64UrlEncoder.Encode(passwordToken)}";
+                string body = $"<a href='{token}'>Klicka på länken för att bekräfta</a>";
 
-                await _tokenSender.SendAsync("patrik.odh@gmail.com", "patrik.odh@gmail.com", "Reset Password link", body, link, user.Name);
+                var emailSettings = Environment.GetEnvironmentVariable("EmailSettings");
+
+                await _tokenSender.SendAsync(emailSettings, emailSettings, "Reset Password link", token, user.Name);
                 ResponseResult(HttpStatusCode.OK, true, "Password reset was successfull", "");
                 return Ok(_response);
             }
@@ -384,8 +393,8 @@ namespace SmileDentistBackend.Controllers
                 else
                 {
                     var identityDescribor = new IdentityErrorDescriber().InvalidToken();
-                    var some = result.Errors.Any(x => x.Code == nameof(IdentityErrorDescriber.InvalidToken));
-                    if (some)
+                    var expiredToken = result.Errors.Any(x => x.Code == nameof(IdentityErrorDescriber.InvalidToken));
+                    if (expiredToken)
                     {
                         ResponseResult(HttpStatusCode.Forbidden, false, "The token has expired", "");
                         return StatusCode(StatusCodes.Status401Unauthorized, _response);

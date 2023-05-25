@@ -8,6 +8,6 @@ namespace SmileDentistBackend.Email.Bookings
         public string Name { get; set; }
 
         [JsonProperty("time")]
-        public DateTime? Time { get; set; }
+        public string Time { get; set; }
     }
 }
