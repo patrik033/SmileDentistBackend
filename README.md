@@ -34,4 +34,4 @@ To update the database simply use the Package Manager Console that comes integra
 
 #### Quartz
 
-Please note that the schedulerer is designed to only run between 06 and 17 local time and no booked messages will be sent outside that timeframe. If you want to use it outside that you have to modify ScheduledHostedService class.
+Please note that the schedulerer is designed to only run between 06 and 17 local time and no booked messages will be sent outside that timeframe. If you want to use it outside that you have to modify ScheduledHostedService class and make modifications to the frontend.
