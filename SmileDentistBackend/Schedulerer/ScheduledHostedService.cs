@@ -30,21 +30,25 @@ namespace SmileDentistBackend.Schedulerer
             Scheduler.JobFactory = _jobFactory;
             //var someTriggers = CreateJobAmounts(SetItems);
 
-            if (DateTime.Now.Hour > 17 || DateTime.Now.Hour < 6)
+            if (DateTime.Now.Hour > 17 && DateTime.Now.Hour < 6)
                 await StopAsync(cancellationToken);
             else
                 await Scheduler.Start(cancellationToken);
 
-            await Scheduler.AddJob(CreateJobForDailyMails(), true);
-            await Scheduler.AddJob(CreateJobsForScheduledMailsHourly(), true);
-            //create schedulerers for day before items in the database
-            var dailyTriggers = FirstDailyTrigger(_serviceProvider);
-            await Scheduler.ScheduleJob(dailyTriggers);
+            if (DateTime.Now.Hour > 6  && DateTime.Now.Hour < 17)
+            {
+
+                await Scheduler.AddJob(CreateJobForDailyMails(), true);
+                await Scheduler.AddJob(CreateJobsForScheduledMailsHourly(), true);
+                //create schedulerers for day before items in the database
+                var dailyTriggers = FirstDailyTrigger(_serviceProvider);
+                await Scheduler.ScheduleJob(dailyTriggers);
 
 
-            //create schedulers for hourly jobs in the database
-            var hourlyTrigger = await HourlyTrigger(_serviceProvider);
-            await Scheduler.ScheduleJob(hourlyTrigger);
+                //create schedulers for hourly jobs in the database
+                var hourlyTrigger = await HourlyTrigger(_serviceProvider);
+                await Scheduler.ScheduleJob(hourlyTrigger);
+            }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

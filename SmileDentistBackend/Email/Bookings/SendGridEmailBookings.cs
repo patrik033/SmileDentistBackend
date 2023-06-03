@@ -15,6 +15,7 @@ namespace SmileDentistBackend.Email.Bookings
         public async Task<Response> SendAsync(string from, string to, string subject, string body, DateTime? time, string name)
         {
             var environmentVariableKey = Environment.GetEnvironmentVariable("SendGrid");
+            var bookingTemplate = Environment.GetEnvironmentVariable("BookingTemplate");
             //var sendGridKey = _emailSettings.Value.Key;
             var sendGridClient = new SendGridClient(environmentVariableKey);
             var sendGridMessage = new SendGridMessage();
@@ -23,7 +24,7 @@ namespace SmileDentistBackend.Email.Bookings
             sendGridMessage.SetFrom(from);
             sendGridMessage.AddTo(to);
             sendGridMessage.SetSubject(subject);
-            sendGridMessage.SetTemplateId("d-e0c5b898b60a45a6ad76aa450b26b442");
+            sendGridMessage.SetTemplateId(bookingTemplate);
             sendGridMessage.SetTemplateData(new ExampleTemplateData
             {
                 Name = name,
